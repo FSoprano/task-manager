@@ -1,0 +1,89 @@
+// CRUD operations: create, read, update, delete
+// const mongodb = require('mongodb');
+// To get the connectors for CRUD ops from mongodb:
+// const MongoClient = mongodb.MongoClient;
+// The connectionURL starts with mongodb because that is their protocol.
+// Type out the localhost URL because typing 'localhost' causes issues/
+// strange behaviour.
+// Grabbing another item from mongodb:
+// const ObjectID = mongodb.ObjectID;
+// After object destructuring, we get:
+const { MongoClient, ObjectID} = require('mongodb');
+const id = new ObjectID();
+// ObjectId() is a constructor function, hence we need the new keyword.
+console.log(id);
+console.log(id.getTimestamp());
+// getTimeStamp() will derive a timestamp from the first 4 digits of an 
+// ObjectID. The first 4 digits are a pointer to the moment in time since 
+// the advent of UNIX, that is, Jan 1, 1970.
+// Object IDs are binary data; This allows to cut the byte-size of an ID in 
+// half (as opposed to a string);
+// To prove this: ObjectID has an id property, so we can log the following 
+// to the console, which will output the binary data.
+console.log(id.id);
+// We can display the byte length of this binary data by adding:
+console.log(id.id.length);
+// This is 12.
+// If we now convert the ID to a string, we get 24:
+console.log(id.toHexString().length);
+const connectionURL = 'mongodb://127.0.0.1:27017';
+// We can pick any database name we like:
+const databaseName = 'task-manager';
+MongoClient.connect(connectionURL, { useNewUrlParser: true }, (error, client) => {
+    // The old URLParser was deprecated, hence this strange object as the second 
+    // argument. The third argument is a callback function. The connection to the 
+    // DB is asynchronous.
+    if (error) {
+        return console.log('Connection to database failed.');
+        // return to stop function execution if error occurs.
+    };
+    // Just to test the connection: console.log('Connected correctly!');
+    // We don't have to create the Mongo DB; Mongo creates it for us. 
+    // All we have to do is provide a name:
+    const db = client.db(databaseName);
+    // Creating a collection and inserting a first document:
+    // db.collection('users').insertOne({
+    //     name: 'Francesco',
+    //     age: 54
+    // }, (error, result) => {
+    //     if (error) {
+    //         return console.log('Unable to insert user');
+    //     }
+    //     console.log(result.insertedId); 
+    //     // result.ops (array) is no longer there due to an API change;
+    //     // Therefore use result.inserteIds to get some sort of feedback.
+    // });
+    // db.collection('users').insertMany([
+    //     { name: 'Harald' , age: 37 },
+    //     { name: 'Klara' , age: 107 }
+    // ], (error, result) => {
+    //     if (error) {
+    //         return console.log('Unable to insert documents!');
+    //     }
+    //     console.log(result.insertedIds);
+    // })
+    // db.collection('tasks').insertMany([
+    //         { description: 'Empty bin.' , completed: true },
+    //         { description: 'Fix garage roof.' , completed: false },
+    //         { description: 'Change car battery.', completed: true}
+    //     ], (error, result) => {
+    //         if (error) {
+    //             return console.log('Unable to insert documents!');
+    //         }
+    //         console.log(result.insertedIds);
+    //     });
+    // Creating a collection and inserting a document that uses
+    // the predefined Object ID (id) from above:
+    // db.collection('users').insertOne({
+    //     _id: id,
+    //     name: 'Francesco',
+    //     age: 54
+    // }, (error, result) => {
+    //     if (error) {
+    //         return console.log('Unable to insert user');
+    //     }
+    //     console.log(result.insertedId); 
+    //     // result.ops (array) is no longer there due to an API change;
+    //     // Therefore use result.inserteIds to get some sort of feedback.
+    // });
+});
