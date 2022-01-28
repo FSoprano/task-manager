@@ -90,6 +90,36 @@ app.get('/users/:id', async (req, res) => {
         //     res.status(500).send(e)
         // })
 })
+app.patch('/users/:id', async (req, res) => {
+    // patch() is for updating an existing resource.
+    // Hint: properties that do not exist are ignored. The record is returned when found, but a non-exisiting 
+    // property will not be added. 
+    // To provide the user with information about that:
+    const updates = Object.keys(req.body) // Adds each req.body key as a value to an array.
+    const allowedUpdates = [ 'name', 'age', 'email', 'password'] // An array of all keys that are allowed to be updated.
+    const isAllowedUpdate = updates.every((update) => allowedUpdates.includes(update))
+    // The good old every iterator; it checks if each key in the updates array is included in the allowedUpdates
+    // array. If so, then the specified key to update is valid.
+    if (!isAllowedUpdate) {
+        // If the specified update key is invalid:
+        res.status(400).send('Invalid update!')
+    }
+    try {
+        const user = await User.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true})
+        // we use req.body because we want this route to work for all IDs.
+        // Converting incoming IDs to req.body: mongoose takes care of that.
+        // The 3rd argument to findByIdAndUpdate is a bunch of options one can set in an object. new: true will
+        // display the user record with the updates already applied. runValidators ensures that the validators 
+        // that were set up are run; i.e. that a record cannot be updated with wrong values.
+        if (!user) {
+            return res.status(404).send()
+        }
+        res.send(user)
+    } catch (e) {
+        // 2 possibilities here: 1. Validation error 2. Server error (500)
+        res.status(400).send(e)
+    } 
+})
 app.post('/tasks', async (req, res) => {
     const task = new Task(req.body)
     try {
@@ -124,6 +154,23 @@ app.get('/tasks/:id', async (req, res) => {
         res.send(task)
     } catch (e) {
         res.status(500).send()
+    }
+})
+app.patch('/tasks/:id', async (req, res) => {
+    const updates = Object.keys(req.body)
+    const allowedUpdates = [ 'description', 'completed']
+    const isAllowedUpdate = updates.every((update) => allowedUpdates.includes(update))
+    if (!isAllowedUpdate) {
+        res.status(400).send('Invalid task update')
+    }
+    try {
+        const task = await Task.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true })
+        if (!task) {
+            return res.status(404).send()
+        }
+        res.send(task)
+    } catch (e) {
+        res.status(400).send(e)
     }
 })
 
