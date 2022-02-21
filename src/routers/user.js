@@ -98,7 +98,20 @@ router.patch('/users/:id', async (req, res) => {
         res.status(400).send('Invalid update!')
     }
     try {
-        const user = await User.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true})
+        // for the password hashing, we need to change something here
+        // because currently, findByIdAndUpdate bypasses mongoose. 
+        // It performs a direct operation on the database. This means the
+        // the pre() method we need for password hashing is not executed.
+        // So the change is (old code line commented out below):
+        const user = await User.findById(req.params.id)
+        updates.forEach((update) => {
+            user[update] = req.body[update]
+            // Object notation does not work here because we don't 
+            // know the name of the property to be updated beforehand.
+        })
+        await user.save()
+        // const user = await User.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true})
+        
         // we use req.body because we want this route to work for all IDs.
         // Converting incoming IDs to req.body: mongoose takes care of that.
         // The 3rd argument to findByIdAndUpdate is a bunch of options one can set in an object. new: true will

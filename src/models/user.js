@@ -1,5 +1,6 @@
 const mongoose = require('mongoose')
 const validator = require('validator')
+const bcrypt = require('bcryptjs')
 
 const userSchema = new mongoose.Schema(
     {
@@ -64,6 +65,12 @@ userSchema.pre('save', async function (next) {
     // us access to the individual user.
 
     console.log('just before saving the user')
+    if (user.isModified('password')) {
+        // This checks if the password has been changed by 
+        // either creating or updating a user.
+        user.password = await bcrypt.hash(user.password, 8)
+        // 8 is the number of hashing rounds.
+    }
 
     next() // This tells the app that we're finished running code 
     // before a user is saved. We can't just use the 
