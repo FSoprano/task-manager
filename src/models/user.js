@@ -28,6 +28,8 @@ const userSchema = new mongoose.Schema(
         email: {
             type: String,
             required: true,
+            unique: true, // Different users should never use the same email.
+            // Hint: Need to drop the entire database to make this work.
             trim: true,
             lowercase: true, // From mongoose. Converts the entered address to lowercase.
             validate(value) {
@@ -56,7 +58,31 @@ const userSchema = new mongoose.Schema(
         }
     }
 )
+// User sign-up. We have to create a new schema to do this.
+userSchema.statics.findByCredentials = async (email, password) => {
+    // Need to find user by email first. We cannot find by credentials because
+    // we have the password in plain text, and the hashed pw is only in the 
+    // database.
 
+    const user = await User.findOne( {email} )
+    // Remember {email} -> shorthand for {email: email}
+    // findOne is similar to findById except that it takes in an object. 
+    if (!user) {
+        throw new Error ('Unable to log in.')
+    } // Function stops running if user is not found by email.
+
+    const isMatch = await bcrypt.compare(password, user.password)
+    // password = pw provided in plain text; user.password =  hashed pw.
+    // If the passwords don't match
+    if (!isMatch) {
+        throw new Error ('Unable to log in.')
+    } // Function stops running if passwords don't match.
+
+    // If email and pw are OK:
+    return user
+}
+
+// Hash the plain text password before saving:
 userSchema.pre('save', async function (next) {
     // It must be function () here because arrow functions do not bind this.
     const user = this // Just a convencience that makes it unnecessary to 

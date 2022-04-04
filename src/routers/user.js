@@ -24,6 +24,17 @@ router.post('/users', async (req, res) => {
     //     res.status(400).send(error)
     // })
 })
+// New route for signing up:
+router.post('/users/login', async (req, res) => {
+    try {
+        const user = await User.findByCredentials(req.body.email, req.body.password)
+        // findByCredentials: we can also define our own function here.
+        // This function is defined in the user model (models/user.js).
+        res.send(user)
+    } catch (e) {
+        res.status(400).send()
+    }
+})
 router.get('/users', async (req, res) => {
     const users = await User.find({})
 
