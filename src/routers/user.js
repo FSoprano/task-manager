@@ -34,6 +34,9 @@ router.post('/users/login', async (req, res) => {
     } catch (e) {
         res.status(400).send()
     }
+    /* Only 2 routes will be publicly available: "Create user" and "Login". All others require an 
+    authentication. We use JSON web tokens for that.
+    */
 })
 router.get('/users', async (req, res) => {
     const users = await User.find({})
