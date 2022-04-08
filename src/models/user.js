@@ -1,6 +1,7 @@
 const mongoose = require('mongoose')
 const validator = require('validator')
 const bcrypt = require('bcryptjs')
+const jwt = require('jsonwebtoken')
 
 const userSchema = new mongoose.Schema(
     {
@@ -55,9 +56,33 @@ const userSchema = new mongoose.Schema(
                 // that you can have only one validate call per field.
             }
     
-        }
+        }, 
+    // If a user cannot log, the token remains valid, and if it falls 
+    // into the wrong hand, be used by somebody else. It is therefore necessary, 
+    // that we track all tokens; Each token will be an object with a key of 
+    // 'token', Multiple tokens 
+    // will be objects in an array of tokens. Tracking tokens gives us 
+    // the chance to invalidate them.
+    tokens: [{
+        token: { type: String,
+               required: true
+            }
+        }]
     }
 )
+// Function to generate a requested authentication token:
+// Hint: .statics methods or functions are accessible on the model.
+// .methods methods or functions are accessible on the instances of a model.
+userSchema.methods.generateAuthToken = async function () {
+    const user = this
+    // Remember: this -> 'async function', not arrow function.
+    const token = jwt.sign({ _id: user._id.toString()}, 'thisismynewcourse')
+    user.tokens = user.tokens.concat( {token} ) // Shorthand for {token: token} 
+    // Adding each token as an object with key token to the array of tokens.
+    await user.save() // Saving the tokens to the database.
+    return token
+    
+}
 // User sign-up. We have to create a new schema to do this.
 userSchema.statics.findByCredentials = async (email, password) => {
     // Need to find user by email first. We cannot find by credentials because

@@ -8,7 +8,12 @@ router.post('/users', async (req, res) => {
     // Using async / await:
     try {
         await user.save()
-        res.status(201).send(user)
+        const token = await user.generateAuthToken()
+        // Generate an authentication for the signup user. Mind the lowercase 
+        // 'user': This is a token for a particular user, not a lookup in the 
+        // collection of users (User).
+        // The function is defined in the user model (models/user.js) file.
+        res.status(201).send({ user, token })
     } catch (e) {
         res.status(400).send(e)
     }
@@ -30,7 +35,13 @@ router.post('/users/login', async (req, res) => {
         const user = await User.findByCredentials(req.body.email, req.body.password)
         // findByCredentials: we can also define our own function here.
         // This function is defined in the user model (models/user.js).
-        res.send(user)
+        const token = await user.generateAuthToken()
+        // Generate an authentication for the login user. Mind the lowercase 
+        // 'user': This is a token for a particular user, not a lookup in the 
+        // collection of users (User).
+        // The function will be defined in the user model (models/user.js) file.
+        res.send( { user, token })
+        // Return the user and the token.
     } catch (e) {
         res.status(400).send()
     }
