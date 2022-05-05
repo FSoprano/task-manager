@@ -1,5 +1,6 @@
 const express = require('express')
 const User = require('../models/user')
+const auth = require('../middleware/auth')
 const router = new express.Router()
 
 router.post('/users', async (req, res) => {
@@ -49,7 +50,14 @@ router.post('/users/login', async (req, res) => {
     authentication. We use JSON web tokens for that.
     */
 })
-router.get('/users', async (req, res) => {
+
+/* The following route allows a logged in user to list the details of 
+all other users. This not something we want to support. Instead, the user 
+should be able to see his own information only.
+router.get('/users', auth, async (req, res) => {
+    // auth: Add middleware function to this route, moving the route request 
+    // to 3rd place in the list of arguments. Can thus add middleware authentication 
+    // to selected routes.
     const users = await User.find({})
 
     try {
@@ -69,6 +77,19 @@ router.get('/users', async (req, res) => {
     //     // considered a success. Hence a 404 would make no sense here.
     // })
 })
+*/
+/* The above route allows a logged in user to list the details of 
+all other users. This not something we want to support. Instead, the user 
+should be able to see his own information only. We achieve this as 
+follows: */
+router.get('/users/me', auth, async (req, res) => {
+    // /users/me will get the logged in user's profile (just this user's 
+    // information)
+    // No need to look up and fetch the user because the auth token already 
+    // has that information (see auth.js). So all we need is:
+    res.send(req.user)
+})
+
 // All express methods have the same signature: 1. Route, 2. Callback function
 // that uses a request and a response object.
 // :id. This is not a field name. We could use any token or string here 
