@@ -27,12 +27,19 @@ const auth = async (req, res, next) => {
        if (!user) {
            throw new Error()
        }
+
+    
        // If things went well ...
        // The user has already been fetched by the findOne call, so there's no 
        // need to fetch it again. We just store the value by adding a 
        // property to the req object and assign the value of the 
        // user const variable, like:
        req.user = user
+       req.token = token
+       // We also add the token that was used to the req.object. When we 
+       // log out user, we need authentication and want to use this exact token.
+       // (A user might be logged in from several different devices, and we 
+       // don't want to log out of all of them.)
        next()
 
 

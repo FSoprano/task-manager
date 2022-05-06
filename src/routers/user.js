@@ -51,6 +51,32 @@ router.post('/users/login', async (req, res) => {
     */
 })
 
+router.post('/users/logout', auth, async (req, res) => {
+    try {
+        req.user.tokens = req.user.tokens.filter((token) => {
+            return token.token !== req.token // we set req.token in auth.js
+            // token.token: the tokens array is a list of token objects, 
+            // each of which has a _id and a token key/value pair.
+            // We address the token value here. (token highlighted orange here: a single object in the array
+            // that is iterated over, and of that we look at the token value. Hence token.token.
+        })
+        await req.user.save()
+        res.send()
+    } catch (e) {
+        res.status(500).send()
+    }
+})
+
+router.post('/users/logoutAll', auth, async (req, res) => {
+    try {
+        req.user.tokens = []
+        await req.user.save()
+        res.send()
+    } catch (e) {
+        res.status(500).send()
+    }
+})
+
 /* The following route allows a logged in user to list the details of 
 all other users. This not something we want to support. Instead, the user 
 should be able to see his own information only.
