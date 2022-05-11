@@ -70,6 +70,26 @@ const userSchema = new mongoose.Schema(
         }]
     }
 )
+/* //Function to hide certain properties (pw, tokens array) from the 
+// response object:
+userSchema.methods.getPublicProfile = function () {
+    const user = this
+    const userObject = user.toObject()  // toObject() is a mongoose function.
+    // Removing certain props from the response object:
+    delete userObject.password
+    delete userObject.tokens
+    return userObject
+} */
+// Function to hide certain properties (pw, tokens array) from the 
+// response object (elegant solution wihtout callback function)
+userSchema.methods.toJSON = function () {
+    const user = this
+    const userObject = user.toObject()  // toObject() is a mongoose function.
+    // Removing certain props from the response object:
+    delete userObject.password
+    delete userObject.tokens
+    return userObject
+}
 // Function to generate a requested authentication token:
 // Hint: .statics methods or functions are accessible on the model.
 // .methods methods or functions are accessible on the instances of a model.

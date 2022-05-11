@@ -43,6 +43,11 @@ router.post('/users/login', async (req, res) => {
         // The function will be defined in the user model (models/user.js) file.
         res.send( { user, token })
         // Return the user and the token.
+        // We don't want to return the password and the tokens array though.
+        // So we're gonna hide that information by not returning the entire 
+        // user object. Instead, we assgin a function to the user key. This 
+        // function, getPublicProfie, is defined in the user.js model file,
+        // then removed again and replaced with the toJSON method.
     } catch (e) {
         res.status(400).send()
     }

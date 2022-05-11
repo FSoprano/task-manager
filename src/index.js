@@ -69,9 +69,9 @@ app.listen(port, () => {
 // myFunction()
 
 // JSON web token basics:
-const jwt = require('jsonwebtoken')
-const myFunction = async () => {
-    const token = jwt.sign({ _id: 'abc123' }, 'thisismynewcourse', { expiresIn: '7 days'})
+// const jwt = require('jsonwebtoken')
+// const myFunction = async () => {
+   // const token = jwt.sign({ _id: 'abc123' }, 'thisismynewcourse', { expiresIn: '7 days'})
     // jwt.sign takes 3 arguments, an object, a string, and another object.
     // The object contains the data embedded in the token.
     // What we need is an identifier of the login user. 
@@ -82,7 +82,7 @@ const myFunction = async () => {
     // The 3rd argument is an objects where one can set extra values.
     // We use the expiresIn key here, to make the token expire. Note the 
     // bizarre string notation of the value.
-    console.log(token) // Prints the token to the screen.
+    // console.log(token) // Prints the token to the screen.
     // The token consists of 3 parts separated by dots. The 1st part is the header.
     // It is a base 64-encoded JSON string which says what type of token it is 
     // and by which algorithm it was generated. The 2nd part is the body or payload. It contains 
@@ -91,11 +91,10 @@ const myFunction = async () => {
     // To test a token: base64decode.org
 
     // To verify the token:
-    const data = jwt.verify(token, 'thisismynewcourse')
+    // const data = jwt.verify(token, 'thisismynewcourse')
     // 1st argument is the token you want to verify; 2nd is the secret used 
     // to sign (you need an exact match here!)
-    console.log(data) // Returns the token and an "Issued at" (iat) value, 
+    // console.log(data) // Returns the token and an "Issued at" (iat) value, 
     // which is a timestamp.
-
-}
-myFunction()
+//}
+// myFunction()
