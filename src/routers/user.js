@@ -125,7 +125,11 @@ router.get('/users/me', auth, async (req, res) => {
 // that uses a request and a response object.
 // :id. This is not a field name. We could use any token or string here 
 // starting with a colon.
-router.get('/users/:id', async (req, res) => {
+// The next route is not needed anymore; a user should not be able to 
+// fetch another user's data by ID, just her or his own. This however is already 
+// done by the /users/me route above. Since get /users/:id requires authentication,
+// we make things easy and just remove it.
+/* router.get('/users/:id', async (req, res) => {
         console.log(req.params) 
         // To get any param info out on the console, send a GET request 
         // from Postman that goes to localhost:3000/users/344555 (some random number)
@@ -160,7 +164,8 @@ router.get('/users/:id', async (req, res) => {
         //     res.status(500).send(e)
         // })
 })
-router.patch('/users/:id', async (req, res) => {
+*/
+router.patch('/users/me', auth, async (req, res) => {
     // patch() is for updating an existing resource.
     // Hint: properties that do not exist are ignored. The record is returned when found, but a non-exisiting 
     // property will not be added. 
@@ -180,13 +185,16 @@ router.patch('/users/:id', async (req, res) => {
         // It performs a direct operation on the database. This means the
         // the pre() method we need for password hashing is not executed.
         // So the change is (old code line commented out below):
-        const user = await User.findById(req.params.id)
+        // const user = await User.findById(req.user._id) // Not needed anymore.
+        // See delete route.
+        // await req.user._id.fetch()
         updates.forEach((update) => {
-            user[update] = req.body[update]
+            req.user[update] = req.body[update]
             // Object notation does not work here because we don't 
             // know the name of the property to be updated beforehand.
+
         })
-        await user.save()
+        await req.user.save()
         // const user = await User.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true})
         
         // we use req.body because we want this route to work for all IDs.
@@ -194,22 +202,33 @@ router.patch('/users/:id', async (req, res) => {
         // The 3rd argument to findByIdAndUpdate is a bunch of options one can set in an object. new: true will
         // display the user record with the updates already applied. runValidators ensures that the validators 
         // that were set up are run; i.e. that a record cannot be updated with wrong values.
-        if (!user) {
+        /* if (!user) {
             return res.status(404).send()
-        }
-        res.send(user)
+        } */ // Not needed anymore. See delete route.
+        res.send(req.user)
     } catch (e) {
         // 2 possibilities here: 1. Validation error 2. Server error (500)
         res.status(400).send(e)
     } 
 })
-router.delete('/users/:id', async (req, res) => {
+router.delete('/users/me', auth, async (req, res) => {
+    // replace /users/:id with /users/me. Even an authenticated user 
+    // should not be able to delete another user's profile by ID.
     try {
-        const user = await User.findByIdAndDelete(req.params.id)
-        if (!user) {
+        // const user = await User.findByIdAndDelete(req.user._id)
+        // req.params.id no longer exists. We have to replace it with 
+        // req.user._id. Remember: We added the user to the request object in
+        // auth.js, and we have access to it from here because we use the 
+        // auth method.
+        // The more elegant method, however, is:
+        await req.user.remove()
+        /* if (!user) {
             return res.status(404).send()
-        }
-        res.send(user)
+        } */
+        // The if-block is not needed anymore since we don't look up a user's 
+        // ID anymore. Just the login user can delete her or his own profile.
+        res.send(req.user) // user -> req.user (we don't have a standalone user 
+        // variable anymore)
     } catch (e) {
         res.status(500).send()
     }
