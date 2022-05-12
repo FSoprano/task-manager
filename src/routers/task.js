@@ -1,9 +1,17 @@
 const express = require('express')
 const Task = require('../models/task')
+const auth = require('../middleware/auth')
 const router = new express.Router()
 
-router.post('/tasks', async (req, res) => {
-    const task = new Task(req.body)
+router.post('/tasks', auth, async (req, res) => {
+    // const task = new Task(req.body)
+
+    const task = new Task({
+        ...req.body,     // spread operator, copies everything from req.body
+        owner: req.user._id // plus owner. Compare old code (commented out). 
+        // We have access to req.user because
+        // we use the auth method.
+    })
     try {
         await task.save()
         res.status(201).send(task)

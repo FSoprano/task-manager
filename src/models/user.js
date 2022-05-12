@@ -70,6 +70,15 @@ const userSchema = new mongoose.Schema(
         }]
     }
 )
+userSchema.virtual('tasks', {
+    ref: 'Task',
+    localField: '_id', // The user's ID is associated with the owner Object ID in the Task model.
+    foreignField: 'owner' // ref set up in the owner field of the Task model
+}) // This is a virtual reference (sth. that is not stored in the database. 
+// It sets up a relationship with the Task model from the User model. 
+// Cf. the reference we set in the owner field of the Task model, which references 
+// the User model, and does get stored in the database.
+
 /* //Function to hide certain properties (pw, tokens array) from the 
 // response object:
 userSchema.methods.getPublicProfile = function () {

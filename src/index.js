@@ -50,6 +50,22 @@ app.listen(port, () => {
     console.log('Server is up on port ' + port)
 })
 
+const Task = require('./models/task')
+const User = require('./models/user')
+const main = async () => {
+    
+    //const task = await Task.findById('627d02aa1884c3b2114d5766')
+    //await task.populate('owner') // This populates the task.owner with data 
+    // from the referenced user profile.
+    //console.log(task.owner)
+
+    // To find the a user, and then the task belonging to that user:
+    const user = await User.findById('627d0020e6cbdaa5c4057d9a')
+    await user.populate('tasks') // The stuff from the virtual field in the User model.
+    console.log(user.tasks)
+}
+main()
+
 // Secure passwords with bcryptjs (basics):
 // const bcrypt = require('bcryptjs')
 // const myFunction = async () => {
