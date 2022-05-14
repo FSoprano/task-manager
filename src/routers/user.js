@@ -230,6 +230,7 @@ router.delete('/users/me', auth, async (req, res) => {
         res.send(req.user) // user -> req.user (we don't have a standalone user 
         // variable anymore)
     } catch (e) {
+        console.log(e)
         res.status(500).send()
     }
 

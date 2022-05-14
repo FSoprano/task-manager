@@ -2,6 +2,7 @@ const mongoose = require('mongoose')
 const validator = require('validator')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
+const Task = require('./task')
 
 const userSchema = new mongoose.Schema(
     {
@@ -157,6 +158,13 @@ userSchema.pre('save', async function (next) {
     // end of the function call for this because it won't insure that asynchronous 
     // processes have been finished. We have to make sure that next() gets called.
     // Otherwise the function is going to hang infinitely. 
+})
+
+userSchema.pre('remove', async function (next) {
+    // Delete user tasks when user is removed:
+    const user = this
+    await Task.deleteMany({ owner: user._id })
+    next()
 })
 // Refactored from mongoose.js:
 const User = mongoose.model('User', userSchema)
