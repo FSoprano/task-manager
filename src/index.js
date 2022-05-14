@@ -60,11 +60,11 @@ const main = async () => {
     //console.log(task.owner)
 
     // To find the a user, and then the task belonging to that user:
-    const user = await User.findById('627d0020e6cbdaa5c4057d9a')
+    const user = await User.findById('627e573917531596afc47c43')
     await user.populate('tasks') // The stuff from the virtual field in the User model.
     console.log(user.tasks)
 }
-main()
+// main()
 
 // Secure passwords with bcryptjs (basics):
 // const bcrypt = require('bcryptjs')
