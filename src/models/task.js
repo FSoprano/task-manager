@@ -2,8 +2,10 @@ const mongoose = require('mongoose')
 
 
 // Refactored from mongoose.js:
-const Task = mongoose.model('Task', {
+const taskSchema = new mongoose.Schema( {
     // The model defines the database structure:
+    // We need a schema to define additional options (here: the timestaps.).
+    // Before, we just had a Task model.
     description: {
         type: String,
         required: true,
@@ -22,5 +24,8 @@ const Task = mongoose.model('Task', {
         // the entire user profile from a task (profile of the user who created 
         // the task.)
     } // Hint: Trash existing database / recreate after changing a model.
+}, {
+    timestamps: true
 })
+const Task = mongoose.model('Task', taskSchema)
 module.exports = Task

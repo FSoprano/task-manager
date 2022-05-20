@@ -69,6 +69,9 @@ const userSchema = new mongoose.Schema(
                required: true
             }
         }]
+    } , { // This 2nd object we pass in creates two timestamps in the database:
+        // createdAt and updatedAt
+        timestamps: true
     }
 )
 userSchema.virtual('tasks', {
