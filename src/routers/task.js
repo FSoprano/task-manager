@@ -32,22 +32,30 @@ router.get('/tasks', auth, async (req, res) => {
     // completed tasks.
     // Most of these functions use the query string, for example:
     // GET /tasks?completed=false => fetches just the incomplete tasks
+    // GET /tasks?limit=10 => Limits the returned list to 10 hits
+    // GET /tasks?limit=10?skip=10 => Returns 10 hits per page, start on the
+    // second page (because the first 10 hits = 1st page are skipped).
 
-    const match = {}
+    const findTask = { owner: req.user._id }
+    
     if (req.query.completed) {
         // match.completed = req.query.completed
         // This won't work because true and false in the query strings are strings, 
         // rather than Boolean values. To get a Boolean out of this:
         
-            match.completed = req.query.completed === 'true'
+            findTask.completed = req.query.completed === 'true'
     } 
+    const findOptions = {
+        limit: parseInt(req.query.limit), 
+        skip: parseInt(req.query.skip)
+     }
+
     try {
-        if (req.query.completed) {
-            tasks = await Task.find({ owner: req.user._id, 
-            completed: match.completed
-       }) } else {
-        tasks = await Task.find({ owner: req.user._id })
-       }
+       // According to the Mongoose documentation find is looking for the parameters in this order:  
+       // conditions, [projections], [options], [callback]
+       // So you have to set projections to null.
+        const tasks = await Task.find( findTask, null, findOptions )
+       
         res.send(tasks)
         // alternative solution:
         // await req.user.populate('tasks')
