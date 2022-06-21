@@ -26,8 +26,28 @@ router.post('/tasks', auth, async (req, res) => {
         // This can be chained together:
 })
 router.get('/tasks', auth, async (req, res) => {
+    // This one is ideal for extra functions like filtering, 
+    // pagination, and sorting because it is the only one that fetches 
+    // a long list of items, many of which are irrelevant, such as 
+    // completed tasks.
+    // Most of these functions use the query string, for example:
+    // GET /tasks?completed=false => fetches just the incomplete tasks
+
+    const match = {}
+    if (req.query.completed) {
+        // match.completed = req.query.completed
+        // This won't work because true and false in the query strings are strings, 
+        // rather than Boolean values. To get a Boolean out of this:
+        
+            match.completed = req.query.completed === 'true'
+    } 
     try {
-        const tasks = await Task.find({ owner: req.user._id })
+        if (req.query.completed) {
+            tasks = await Task.find({ owner: req.user._id, 
+            completed: match.completed
+       }) } else {
+        tasks = await Task.find({ owner: req.user._id })
+       }
         res.send(tasks)
         // alternative solution:
         // await req.user.populate('tasks')
