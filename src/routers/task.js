@@ -35,8 +35,12 @@ router.get('/tasks', auth, async (req, res) => {
     // GET /tasks?limit=10 => Limits the returned list to 10 hits
     // GET /tasks?limit=10?skip=10 => Returns 10 hits per page, start on the
     // second page (because the first 10 hits = 1st page are skipped).
+    // GET /tasks?createdAt:asc --> Sorting on createdAt field in ascending order (descending 
+    // would be desc. Colon: any special character would do here. You could also 
+    // use the underscore.)
 
     const findTask = { owner: req.user._id }
+    const sort = {}
     
     if (req.query.completed) {
         // match.completed = req.query.completed
@@ -44,10 +48,22 @@ router.get('/tasks', auth, async (req, res) => {
         // rather than Boolean values. To get a Boolean out of this:
         
             findTask.completed = req.query.completed === 'true'
-    } 
+    }
+
+    if (req.query.sortBy) {
+        const parts = req.query.sortBy.split(':') // Good old JS split()
+        // creates an array parts with 2 elements: the field name, for example, 
+        // createdAt, and the value after the colon (desc or asc)
+        sort[parts[0]] = parts[1] === 'desc' ? -1 : 1 // -1 descending; 1 ascending
+        // Assigns a key with the name parts[0] in the sort object and sets its value 
+        // We don't know what the user will use / sort on. Hence this notation.
+        // to either -1 or 1, depending on whether the second element in the parts 
+        // array is desc or asc.
+    }
     const findOptions = {
         limit: parseInt(req.query.limit), 
-        skip: parseInt(req.query.skip)
+        skip: parseInt(req.query.skip),
+        sort // shorthand
      }
 
     try {
