@@ -7,6 +7,21 @@ const taskRouter = require('./routers/task')
 const app = express()
 const port = process.env.PORT || 3000
 
+// File upload: We want to give users an option to upload a profile picture.
+const multer = require('multer')  // Multer is a library for file uploads
+const upload = multer({
+    dest: 'images'   // Name of folder to contain images
+})
+// Route endpoint for uploads:
+app.post('/upload', upload.single('upload'), (req, res) => {
+    res.send()    // .single() is a multer function; it takes a string argument.
+    // The string argument is just a freely-chosen name. This is what we need 
+    // to provide as the key in the reqquest body for the file upload.
+})
+
+
+
+// Authentication
 // We need Express middleware to authenticate user actions (by using tokens)
 // without middleware: new request -> run route handler
 // with middleware: new request -> do something -> run route handler
