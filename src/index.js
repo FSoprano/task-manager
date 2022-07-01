@@ -30,12 +30,21 @@ const upload = multer({
         // cb(undefined, false) // Generally reject upload, actually not used here.
     }
 })
+
+
 // Route endpoint for uploads:
 app.post('/upload', upload.single('upload'), (req, res) => {
     res.send()    // .single() is a multer function; it takes a string argument.
     // The string argument is just a freely-chosen name. This is what we need 
     // to provide as the key in the request body for the file upload. The 
     // request body needs to be of type form-data!
+}, (error, req, res, next) => {
+    // Run another function to return a brief JSON message in case 
+    // of an error rather than a lengthy HTML document.
+    // It is important to specify all 4 arguments, so that Express 
+    // knows it's about errors.
+    res.status(400).send({error: error.message})
+
 })
 
 
