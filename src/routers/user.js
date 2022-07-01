@@ -240,7 +240,16 @@ router.delete('/users/me', auth, async (req, res) => {
 // File upload challenge:
 // For explanations, see index.js.
 const upload = multer({
-    dest: 'avatars'
+    dest: 'avatars',
+    limits: {
+        fileSize: 1000000
+    },
+    fileFilter(req, file, cb) {
+        if (!file.originalname.match(/\.(jpg|jpeg|png)$/i)) {
+            return cb(new Error ('Please upload an image file!'))
+        }
+        cb(undefined, true)
+    }
 })
 router.post('/users/me/avatars', upload.single('avatar'), (req, res) => {
     res.send()
