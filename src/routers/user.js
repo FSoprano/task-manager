@@ -240,7 +240,8 @@ router.delete('/users/me', auth, async (req, res) => {
 // File upload challenge:
 // For explanations, see index.js.
 const upload = multer({
-    dest: 'avatars',
+    // dest: 'avatars', If we delete dest, multer will pass the uploaded data back to the route handler that calls multer, 
+    // so that we can deal with the data in other ways (save it to the database).
     limits: {
         fileSize: 1000000
     },
@@ -251,7 +252,23 @@ const upload = multer({
         cb(undefined, true)
     }
 })
-router.post('/users/me/avatars', upload.single('avatar'), (req, res) => {
+router.post('/users/me/avatars', auth, upload.single('avatar'), async (req, res) => {
+    req.user.avatar = req.file.buffer
+    // req.file.buffer is where the uploaded image data of a request is. Assigning it to req.user.avatar, we assign the 
+    // database destination.
+    await req.user.save() // Saving any uploaded image to the database.
+    res.send()
+}, (error, req, res, next) => {
+    res.status(400).send({ error: error.message })
+})
+
+router.delete('/users/me/avatars', auth, async (req, res) => {
+    req.user.avatar = undefined
+    // To delete an avatar, set req.user.avatar to 'undefined' 
+    // database destination.
+    await req.user.save() // Overwriting the existing avatar data 
+    // in the database with the 'undefined' setting. This should 
+    // remove the avatar field.
     res.send()
 }, (error, req, res, next) => {
     res.status(400).send({ error: error.message })

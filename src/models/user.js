@@ -68,8 +68,13 @@ const userSchema = new mongoose.Schema(
         token: { type: String,
                required: true
             }
-        }]
-    } , { // This 2nd object we pass in creates two timestamps in the database:
+        }],
+    avatar: {
+            type: Buffer  // To upload profile images to the database
+            // Buffer is for binary data.
+        }
+    } ,
+    { // This 2nd object we pass in creates two timestamps in the database:
         // createdAt and updatedAt
         timestamps: true
     }
