@@ -1,5 +1,6 @@
 const express = require('express')
 const multer = require('multer')
+const sharp = require('sharp')
 const User = require('../models/user')
 const auth = require('../middleware/auth')
 const router = new express.Router()
@@ -253,7 +254,11 @@ const upload = multer({
     }
 })
 router.post('/users/me/avatar', auth, upload.single('avatar'), async (req, res) => {
-    req.user.avatar = req.file.buffer
+    // Commenting out req.user.avatar = req.file.buffer because 
+    // we will have sharp do something to the image before we upload it.
+    const buffer = await sharp(req.file.buffer).resize({ width: 250, height: 250 }).png().toBuffer()
+    req.user.avatar = buffer
+
     // req.file.buffer is where the uploaded image data of a request is. Assigning it to req.user.avatar, we assign the 
     // database destination.
     await req.user.save() // Saving any uploaded image to the database.

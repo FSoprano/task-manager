@@ -104,8 +104,10 @@ userSchema.methods.toJSON = function () {
     const user = this
     const userObject = user.toObject()  // toObject() is a mongoose function.
     // Removing certain props from the response object:
-    delete userObject.password
-    delete userObject.tokens
+    delete userObject.password // We don't want this to be returned; security concern
+    delete userObject.tokens // We don't want this to be returned; security concern
+    delete userObject.avatar // Do not return the avatar base64 data when reading a profile. 
+                             // It's just too much data that could impede the process.
     return userObject
 }
 // Function to generate a requested authentication token:

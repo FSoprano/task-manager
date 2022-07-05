@@ -8,44 +8,44 @@ const app = express()
 const port = process.env.PORT || 3000
 
 // File upload: We want to give users an option to upload a profile picture.
-const multer = require('multer')  // Multer is a library for file uploads
-const upload = multer({
-    dest: 'images',   // Name of folder to contain images
-    limits: {
-        fileSize: 1000000  // This is in bytes.
-    },
-    fileFilter(req, file, cb) {
-        // cb = callback function
-        if(!file.originalname.match(/\.(doc|docx)$/)) {
-            //.match checks regex. Search for ., then doc or docx, $ makes sure 
-            // that the string ends with doc or docx.
-            // To check for a single file extension, use .endsWith rather than
-            // .match
-            // Regex checker on regex101.com
-            return cb(new Error('Please upload a Word document!'))
-        }
-        cb(undefined, true)
-        // cb(new Error, ('File must be PDF')) // In case of wrong file type
-        // cb(undefined, true) // If things are OK, and upload can be expected
-        // cb(undefined, false) // Generally reject upload, actually not used here.
-    }
-})
+// const multer = require('multer')  // Multer is a library for file uploads
+// const upload = multer({
+//     dest: 'images',   // Name of folder to contain images
+//     limits: {
+//         fileSize: 1000000  // This is in bytes.
+//     },
+//     fileFilter(req, file, cb) {
+//         // cb = callback function
+//         if(!file.originalname.match(/\.(doc|docx)$/)) {
+//             //.match checks regex. Search for ., then doc or docx, $ makes sure 
+//             // that the string ends with doc or docx.
+//             // To check for a single file extension, use .endsWith rather than
+//             // .match
+//             // Regex checker on regex101.com
+//             return cb(new Error('Please upload a Word document!'))
+//         }
+//         cb(undefined, true)
+//         // cb(new Error, ('File must be PDF')) // In case of wrong file type
+//         // cb(undefined, true) // If things are OK, and upload can be expected
+//         // cb(undefined, false) // Generally reject upload, actually not used here.
+//     }
+// })
 
 
-// Route endpoint for uploads:
-app.post('/upload', upload.single('upload'), (req, res) => {
-    res.send()    // .single() is a multer function; it takes a string argument.
-    // The string argument is just a freely-chosen name. This is what we need 
-    // to provide as the key in the request body for the file upload. The 
-    // request body needs to be of type form-data!
-}, (error, req, res, next) => {
-    // Run another function to return a brief JSON message in case 
-    // of an error rather than a lengthy HTML document.
-    // It is important to specify all 4 arguments, so that Express 
-    // knows it's about errors.
-    res.status(400).send({error: error.message})
+// // Route endpoint for uploads:
+// app.post('/upload', upload.single('upload'), (req, res) => {
+//     res.send()    // .single() is a multer function; it takes a string argument.
+//     // The string argument is just a freely-chosen name. This is what we need 
+//     // to provide as the key in the request body for the file upload. The 
+//     // request body needs to be of type form-data!
+// }, (error, req, res, next) => {
+//     // Run another function to return a brief JSON message in case 
+//     // of an error rather than a lengthy HTML document.
+//     // It is important to specify all 4 arguments, so that Express 
+//     // knows it's about errors.
+//     res.status(400).send({error: error.message})
 
-})
+// })
 
 
 
@@ -93,20 +93,20 @@ app.listen(port, () => {
     console.log('Server is up on port ' + port)
 })
 
-const Task = require('./models/task')
-const User = require('./models/user')
-const main = async () => {
+// const Task = require('./models/task')
+// const User = require('./models/user')
+// const main = async () => {
     
-    //const task = await Task.findById('627d02aa1884c3b2114d5766')
-    //await task.populate('owner') // This populates the task.owner with data 
-    // from the referenced user profile.
-    //console.log(task.owner)
+//     //const task = await Task.findById('627d02aa1884c3b2114d5766')
+//     //await task.populate('owner') // This populates the task.owner with data 
+//     // from the referenced user profile.
+//     //console.log(task.owner)
 
-    // To find the a user, and then the task belonging to that user:
-    const user = await User.findById('627e573917531596afc47c43')
-    await user.populate('tasks') // The stuff from the virtual field in the User model.
-    console.log(user.tasks)
-}
+//     // To find the a user, and then the task belonging to that user:
+//     const user = await User.findById('627e573917531596afc47c43')
+//     await user.populate('tasks') // The stuff from the virtual field in the User model.
+//     console.log(user.tasks)
+// }
 // main()
 
 // Secure passwords with bcryptjs (basics):
