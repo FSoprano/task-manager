@@ -252,7 +252,7 @@ const upload = multer({
         cb(undefined, true)
     }
 })
-router.post('/users/me/avatars', auth, upload.single('avatar'), async (req, res) => {
+router.post('/users/me/avatar', auth, upload.single('avatar'), async (req, res) => {
     req.user.avatar = req.file.buffer
     // req.file.buffer is where the uploaded image data of a request is. Assigning it to req.user.avatar, we assign the 
     // database destination.
@@ -262,7 +262,7 @@ router.post('/users/me/avatars', auth, upload.single('avatar'), async (req, res)
     res.status(400).send({ error: error.message })
 })
 
-router.delete('/users/me/avatars', auth, async (req, res) => {
+router.delete('/users/me/avatar', auth, async (req, res) => {
     req.user.avatar = undefined
     // To delete an avatar, set req.user.avatar to 'undefined' 
     // database destination.
@@ -273,5 +273,31 @@ router.delete('/users/me/avatars', auth, async (req, res) => {
 }, (error, req, res, next) => {
     res.status(400).send({ error: error.message })
 })
+// Showing an uploaded image if there is one:
+router.get('/users/:id/avatar', async (req, res) => {
+    // There might be a chance that the user is not found, or that 
+    // she has no image associated. That's why we use a try/catch block.
+
+    try {
+        const user = await User.findById(req.params.id)
+        // If the user is not found or has no avatar:
+        if (!user || !user.avatar) {
+            throw new Error()
+        }
+        // we need to tell the server (Express) what type of 
+        // data it is getting back or how to interpret it. 
+        // Remember we stored it in base64 (binary data)
+        res.set('Content-Type', 'image/jpg') // What you get is a jpeg image
+        // sending the image
+        res.send(user.avatar)
+        // URL to show image will be something like:
+        // http://localhost:3000/users/62c2fe448b45ee4126ae9321/avatar
+        // Note that Postman probably cannot return the image in the 
+        // correct format, so don't use Postman for the request.
+    }
+    catch (e) {
+        res.status(404).send()
+    }
+} )
 
 module.exports = router
