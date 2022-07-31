@@ -5,7 +5,7 @@ const taskRouter = require('./routers/task')
 
 
 const app = express()
-const port = process.env.PORT || 3000
+const port = process.env.PORT
 
 // File upload: We want to give users an option to upload a profile picture.
 // const multer = require('multer')  // Multer is a library for file uploads

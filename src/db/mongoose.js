@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 
 // Mongoose talks to Mongo DB in the background, so this is very similar 
 // to what we have in the mongodbX.js files:
-mongoose.connect('mongodb://127.0.0.1:27017/task-manager-api');
+mongoose.connect(process.env.DATABASE_URL);
 
 // const me = new User(
 //     { 

@@ -13,7 +13,7 @@ const auth = async (req, res, next) => {
        // with nothing because it is not part of what we want to validate.
 
        // Check if token is valid:
-       const decoded = jwt.verify(token, 'thisismynewcourse')
+       const decoded = jwt.verify(token, process.env.SECRET_KEY)
        // The 2nd argument is the exact string we used to sign the token.
        // Find the user with that token:
        const user = await User.findOne( { _id: decoded._id, 'tokens.token': token })
