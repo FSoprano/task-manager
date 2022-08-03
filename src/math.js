@@ -13,4 +13,16 @@ const celsiusToFahrenheit = (temp) => {
 // 4. Run the Jest to test your work!
 const calculateTip = (total, tipPercent = .25) => total + (total * tipPercent)
 
-module.exports = { fahrenheitToCelsius, celsiusToFahrenheit, calculateTip }
+const add = (a,b) => {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            if ( a < 0 || b < 0 ) {
+                return reject('Numbers must be non-negative')
+                // We use return to stop the function execution.
+            }
+            resolve(a + b)
+        }, 2000)
+    })
+}
+
+module.exports = { fahrenheitToCelsius, celsiusToFahrenheit, calculateTip, add }
