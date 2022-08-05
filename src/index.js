@@ -1,11 +1,14 @@
-const express = require('express')
-require('./db/mongoose')
-const userRouter = require('./routers/user')
-const taskRouter = require('./routers/task')
-
-
-const app = express()
+const app = require('./app')
 const port = process.env.PORT
+
+// We factored out the definition of the Express server (see app.js) so that we can also use the server 
+// for testing with supertest, that is, without starting the server by means of an 
+// app.listen() call. The behavior of the development application does not change by this;
+// we still call index.js to start the server on localhost.
+
+app.listen(port, () => {
+    console.log('Server is up on port ' + port)
+})
 
 // File upload: We want to give users an option to upload a profile picture.
 // const multer = require('multer')  // Multer is a library for file uploads
@@ -82,16 +85,6 @@ app.use((req, res, next) => {
 // middleware functions from now on outsourced to separate files in 
 // 'middleware' folder.
 
-
-app.use(express.json()) // Makes express parse incoming json so that 
-// it becomes available in the request body.
-
-app.use(userRouter)
-app.use(taskRouter)
-
-app.listen(port, () => {
-    console.log('Server is up on port ' + port)
-})
 
 // const Task = require('./models/task')
 // const User = require('./models/user')

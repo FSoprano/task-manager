@@ -12,7 +12,7 @@ router.post('/users', async (req, res) => {
     // Using async / await:
     try {
         await user.save()
-        sendWelcomeEmail(user.email, user.name)
+        // sendWelcomeEmail(user.email, user.name)
         // We know the user has an email because the validation before 
         // save() worked.
         const token = await user.generateAuthToken()
@@ -228,7 +228,7 @@ router.delete('/users/me', auth, async (req, res) => {
         // auth method.
         // The more elegant method, however, is:
         await req.user.remove()
-        sendCancellationEmail(req.user.email, req.user.name)
+        // sendCancellationEmail(req.user.email, req.user.name)
         /* if (!user) {
             return res.status(404).send()
         } */

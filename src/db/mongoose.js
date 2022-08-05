@@ -5,6 +5,15 @@ const mongoose = require('mongoose');
 // to what we have in the mongodbX.js files:
 mongoose.connect(process.env.DATABASE_URL);
 
+// This here fixes the following Jest test error:
+// "A worker process has failed to exit gracefully and has been force exited. 
+// This is likely caused by tests leaking due to improper teardown. 
+// Try running with --detectOpenHandles to find leaks. Active timers can also cause this, 
+// ensure that .unref() was called on them.""
+afterAll(() => {
+    mongoose.connection.close();
+})
+
 // const me = new User(
 //     { 
 //       name: '   Chucky   ', 
