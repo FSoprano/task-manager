@@ -1,18 +1,21 @@
 const { ObjectID } = require('bson');
 const mongoose = require('mongoose');
 
+
 // Mongoose talks to Mongo DB in the background, so this is very similar 
 // to what we have in the mongodbX.js files:
 mongoose.connect(process.env.DATABASE_URL);
 
 // This here fixes the following Jest test error:
+// afterAll( async () => {
+//     await mongoose.connection.close();
+// })
 // "A worker process has failed to exit gracefully and has been force exited. 
 // This is likely caused by tests leaking due to improper teardown. 
 // Try running with --detectOpenHandles to find leaks. Active timers can also cause this, 
 // ensure that .unref() was called on them.""
-afterAll(() => {
-    mongoose.connection.close();
-})
+// Problem: The dev server does not start anymore; you get "afterAll" is not defined.
+
 
 // const me = new User(
 //     { 
