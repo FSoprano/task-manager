@@ -1,12 +1,23 @@
 const request = require('supertest')
 // supertest is a module that tests Express routes. supertest does not need the server 
 // to be up and running.
+const jwt = require('jsonwebtoken')
+const mongoose = require('mongoose')
 const app = require('../src/app') // Loading in the Express server definition.
 const User = require('../src/models/user')
+
+const userOneId = new mongoose.Types.ObjectId() 
+// we define this ID outside of the userOne function because we need it in two places.
+// we need the ID to generate an auth token, which we need in turn to test endpoints that require
+// authentication.
 const userOne = {
+    _id: userOneId,
     name: 'Mike',
     email: 'mike@example.com',
-    password: 'kbqwApp749?'
+    password: 'kbqwApp749?',
+    tokens: [{
+        token: jwt.sign({ _id: userOneId }, process.env.SECRET_KEY)
+    }]
 }
 
 beforeEach( async () => {
@@ -45,4 +56,33 @@ test('Should not log in non-existing user', async () => {
             password: 'grotty0IsHere!'
         }
     ).expect(400)
+})
+test('Should get profile for user', async () => {
+    await request(app)
+    .get('/users/me')
+    // We need to set the Authorization HTTP header before sending the request.
+    // The function needs to check whether the token exists and is valid.
+    .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
+    .send()
+    .expect(200)
+})
+test('Should not get profile for unauthenticated user', async() => {
+    await request(app)
+    .get('/users/me')
+    // We don't send an authorization header (authentication token) at all in this test.
+    .send()
+    .expect(401) // 401 is the return code reserved for cases in which the authentication validation fails.
+})
+test('Should delete authenticated user', async() => {
+    await request(app)
+    .delete('/users/me')
+    .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
+    .send()    
+    .expect(200)
+})
+test('Should not delete unauthenticated user', async() => {
+    await request(app)
+    .delete('/users/me')
+    .send()
+    .expect(401) // 401 is the return code reserved for cases in which the authentication validation fails.
 })
