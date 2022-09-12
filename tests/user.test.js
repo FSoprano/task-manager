@@ -33,21 +33,39 @@ beforeEach( async () => {
 //     console.log('afterEach')
 // })
 test('Should sign up a new user', async () => {
-    await request(app).post('/users').send(
+    // response: store request body in variable so that it can be used for 
+    // further assertions.
+    const response = await request(app).post('/users').send(
         {
             name: 'Hübi',
             email: 'hübi@example.com',
             password: 'hbqwApp749!'
         }
     ).expect(201)
+    // Make sure that the new user has been saved to the database:
+    const user = await User.findById(response.body.user._id)
+    // Make sure the new user exists:
+    expect(user).not.toBeNull()
+    // Assertions about the response:
+    expect(response.body).toMatchObject({
+        user: {
+            name: 'Hübi',
+            email: 'hübi@example.com'
+        },
+        token: user.tokens[0].token
+    })
+    // Make sure that the user password is not stored in plain text:
+    expect(user.password).not.toBe('hbqwApp749!')
 })
 test('Should log in existing user', async () => {
-    await request(app).post('/users/login').send(
+    const response = await request(app).post('/users/login').send(
         {
             email: userOne.email,
             password: userOne.password
         }
     ).expect(200)
+    const user = await User.findById(userOneId)
+    expect(response.body.token).toBe(user.tokens[1].token)
 })
 test('Should not log in non-existing user', async () => {
     await request(app).post('/users/login').send(
@@ -79,6 +97,12 @@ test('Should delete authenticated user', async() => {
     .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
     .send()    
     .expect(200)
+    // Search for the user in the database:
+    const user = await User.findById(userOneId)
+    // userOneId: That's the user who logged in in the previous test. The other one won't work.
+    // Make sure the user got deleted (search result is null):
+    expect(user).toBeNull()
+
 })
 test('Should not delete unauthenticated user', async() => {
     await request(app)
