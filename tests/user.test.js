@@ -110,3 +110,49 @@ test('Should not delete unauthenticated user', async() => {
     .send()
     .expect(401) // 401 is the return code reserved for cases in which the authentication validation fails.
 })
+test('Should upload avatar image', async() => {
+    // Tests the file (avatar) upload function
+    await request(app)
+    // post, set, attach: Supertest functions
+    .post('/users/me/avatar')
+    // Authorization, Bearer: Set up like this in Postman
+    .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
+    // avatar: Set up like this in Postman; 2nd arg: path to file from root of project, here: tests
+    
+    .attach('avatar','tests/fixtures/profile-pic.jpg')
+    .expect(200)
+    const user = await User.findById(userOneId)
+    // This here fails:
+    // expect({}).toBe({})
+    // because the toBe function uses the === operator, which only resolves to true if one is referring 
+    // to exactly the same object. This is not the case here; there are 2 different empty objects.
+    // Therefore, we use the equalTo function.
+    expect({}).toEqual({})
+    // Now we'd like to check if the uploaded image is binary data. Comparing the image in the database with 
+    // the image used by the test is complicated because we cannot directly compare these: The image in the database will 
+    // be different because we used the sharp module to manipulate it.
+    // Checking whether both files are indeed binary data seems sufficient, however.
+    expect(user.avatar).toEqual(expect.any(Buffer))
+})
+test('Should update valid user fields', async() => {
+    await request(app)
+    .patch('/users/me')
+    // We need to set the Authorization HTTP header before sending the request.
+    // The function needs to check whether the token exists and is valid.
+    .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
+    .send({ name: 'Jim'})
+    .expect(200)
+    // Checking the data:
+    const user = await User.findById(userOneId)
+    expect(user.name).toBe('Jim')
+})
+test('Should not update invalid user fields', async() => {
+    
+    await request(app)
+    .patch('/users/me')
+    // We need to set the Authorization HTTP header before sending the request.
+    // The function needs to check whether the token exists and is valid.
+    .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
+    .send({ location: 'Philadelphia' })
+    .expect(400)
+})
