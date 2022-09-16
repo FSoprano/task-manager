@@ -1,33 +1,19 @@
 const request = require('supertest')
 // supertest is a module that tests Express routes. supertest does not need the server 
 // to be up and running.
-const jwt = require('jsonwebtoken')
-const mongoose = require('mongoose')
+// jwt and mongoose requirements moved to db.js in fixtures directory.
 const app = require('../src/app') // Loading in the Express server definition.
 const User = require('../src/models/user')
+// userOneId and userOne definition moved to db.js in fixtures directory (test database).
+const { userOneId, userOne, setupDatabase } = require('./fixtures/db')
 
-const userOneId = new mongoose.Types.ObjectId() 
-// we define this ID outside of the userOne function because we need it in two places.
-// we need the ID to generate an auth token, which we need in turn to test endpoints that require
-// authentication.
-const userOne = {
-    _id: userOneId,
-    name: 'Mike',
-    email: 'mike@example.com',
-    password: 'kbqwApp749?',
-    tokens: [{
-        token: jwt.sign({ _id: userOneId }, process.env.SECRET_KEY)
-    }]
-}
-
-beforeEach( async () => {
+beforeEach(setupDatabase)
     // beforeEach is a Jest function, available as a global. It runs once before each of the test cases 
-    // that follow. Here we have only one test case, so beforeEach() runs a single time.
-    console.log('beforeEach')
-    await User.deleteMany() // Without search criteria, this function deletes all users from the database, so we can 
-    // start tests with a clean slate.
-    await new User(userOne).save()
-})
+    // that follow. 
+    // console.log('beforeEach')
+    // contents of this call moved to setupDatabase function in db.js in fixtures directory.
+    
+
 // afterEach(() => {
 //     // see beforeEach.
 //     console.log('afterEach')

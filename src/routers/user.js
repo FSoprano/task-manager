@@ -183,7 +183,7 @@ router.patch('/users/me', auth, async (req, res) => {
     // array. If so, then the specified key to update is valid.
     if (!isAllowedUpdate) {
         // If the specified update key is invalid:
-        res.status(400).send('Invalid update!')
+        return res.status(400).send('Invalid update!')
     }
     try {
         // for the password hashing, we need to change something here
