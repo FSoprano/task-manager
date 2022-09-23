@@ -142,3 +142,68 @@ test('Should not update invalid user fields', async() => {
     .send({ location: 'Philadelphia' })
     .expect(400)
 })
+test('Should not sign up user with invalid name', async() => {
+    const response = await request(app).post('/users').send(
+        {
+            name: '',
+            email: 'mymail@email.com',
+            password: 'taxi_driver1'
+        }
+    ).expect(400)
+})
+test('Should not sign up user with invalid email', async() => {
+    const response = await request(app).post('/users').send(
+        {
+            name: 'Herbert',
+            email: 'herbert_email.com',
+            password: 'taxi_driver2'
+        }
+    ).expect(400)
+})
+test('Should not sign up user with invalid password', async() => {
+    const pwd = ['1234','password']
+    await pwd.forEach((pw) => {
+        request(app).post('/users').send(
+            {
+                name: 'George',
+                email: 'george@email.com',
+                password: pw
+            }
+        ).expect(400)
+    })
+})
+
+test('Should not update user if unauthenticated', async() => {
+    await request(app)
+    .patch('/users/me')
+    .send({ name: 'Neil'})
+    .expect(401)
+})
+test('Should not update user with invalid name', async() => {
+    await request(app)
+    .patch('/users/me')
+    // We need to set the Authorization HTTP header before sending the request.
+    // The function needs to check whether the token exists and is valid.
+    .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
+    .send({ name: ''})
+    .expect(400)
+})
+test('Should not update user with invalid email', async() => {
+    await request(app)
+    .patch('/users/me')
+    // We need to set the Authorization HTTP header before sending the request.
+    // The function needs to check whether the token exists and is valid.
+    .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
+    .send({ email: 'newemail.com'})
+    .expect(400)
+})
+test('Should not update user with an invalid password', async() => {
+    const pwd = ['1234','password']
+    await pwd.forEach((pw) => {
+        request(app)
+        .patch('/users/me')
+        .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
+        .send({ password: pw})
+        .expect(400)
+    })
+})
